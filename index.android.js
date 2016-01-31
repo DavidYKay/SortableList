@@ -3,49 +3,93 @@
  * https://github.com/facebook/react-native
  */
 'use strict';
-import React, {
+
+const React = require('react-native');
+
+var {
   AppRegistry,
-  Component,
   StyleSheet,
   Text,
-  View
-} from 'react-native';
+  View,
+} = React;
 
-class SortableList extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
-  }
+const QUOTES = require("./react/quotes");
+const SortableList = require("./react/views/SortableList");
+
+var textBoxStyle = {
+  borderWidth: 1,
+  borderColor: "#B9BBFF",
 }
 
-const styles = StyleSheet.create({
+let localStyles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#000445"
+  },
+
+  shuffleContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: "rgba(0,0,0,0.4)"
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
+
+  shuffle: {
+    ...textBoxStyle,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 5,
     margin: 10,
+    backgroundColor: '#33366A',
   },
-  instructions: {
+
+  shuffleText: {
+    color: "#B9BBFF",
     textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    fontWeight: "800",
+  },
+
+  quoteText: {
+    ...textBoxStyle,
+    color: "#B9BBFF",
+    fontSize: 18,
+    margin: 20,
+    marginTop: 0,
+    padding: 10,
   },
 });
 
-AppRegistry.registerComponent('SortableList', () => SortableList);
+var App = React.createClass({
+
+  getInitialState() {
+    let items = {};
+
+    QUOTES.slice(0,10).forEach((quote,i) => {
+      // Javascript hash preserves insertion order except for "numeric" keys.
+      // Add a random prefix to avoid that.
+      items[`@${i}`] = quote;
+    });
+
+    return {
+      items: items,
+    }
+  },
+
+  render() {
+    return (
+		<View style={localStyles.container}>
+			<SortableList items={this.state.items} ref="guessList">
+				{item => <Text style={localStyles.quoteText}>{item}</Text>}
+			</SortableList>
+		</View>
+    );
+  },
+
+});
+
+
+AppRegistry.registerComponent('SortableList', () => App);
